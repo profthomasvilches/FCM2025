@@ -168,9 +168,70 @@ df_sem_prim %>%
 ################## Dados de mortalidade
 
 
-dados_simdo <- read.dbc::read.dbc("Dados/DATASUS/DOAC2015.dbc")
+
+library(tidyverse)
+
+
 glimpse(dados_simdo)
 
+
+roda_arquivo <- function(arquivo){
+  
+  dados_simdo <- read.dbc::read.dbc(arquivo)
+  
+  dados <- dados_simdo %>% 
+    select(DTOBITO, CAUSABAS_O) %>% 
+    mutate(
+      dataobito = as.Date(DTOBITO, "%d%m%Y")
+    )
+  # 
+  # as.Date("2015-10-12")-as.Date("2015-10-10")
+  # 
+  # x <- c(as.Date("2015-10-12"), as.Date("2015-07-12"), as.Date("2015-05-12"))
+  # 
+  # floor(as.integer(x-as.Date("2015-01-01"))/7+1)
+  
+  
+  dados <- dados %>% 
+    mutate(
+      semana = floor(as.integer(dataobito-as.Date("2015-01-01"))/7+1),
+      diasemana = as.Date("2015-01-01")+7*(semana-1),
+      estado = str_remove(arquivo, ".*DO"),
+      estado = str_remove(estado, "\\d{4}\\.dbc")
+    )
+  return(dados)
+  
+}
+
+arquivo = "Dados/DATASUS/DOAC2015.dbc"
+
+roda_arquivo("Dados/DATASUS/DOAC2015.dbc")
+
+arquivos <- list.files("Dados/DATASUS/", full.names = TRUE)
+
+resultados <- map(arquivos, roda_arquivo)
+
+dados <- Reduce(rbind, resultados)
+
+
+nrow(dados)
+head(dados)
+
+dados %>% 
+  group_by(diasemana, estado) %>% 
+  summarise(
+    n = n()
+  ) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = diasemana, y = n, color = estado))+
+  geom_line()+
+  theme_bw()
+
+# 02/03/2015 -> %d/%m/%Y
+# lubridate
+
+dmy("02032015")
+dmy("02/03/2015")
 
 # rastreando neoplasias CID
 
@@ -180,5 +241,8 @@ dados_cancer <- dados_simdo %>%
   )
 
 nrow(dados_cancer)
+
+
+
 
 
