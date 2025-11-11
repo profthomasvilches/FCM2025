@@ -1,0 +1,166 @@
+---
+title: "Graficos"
+author: "Thomas Vilches"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+library(rcartocolor)
+
+cores <- carto_pal(12, "Bold")
+scales::show_col(cores)
+```
+
+## GGPLOT
+
+O conjunto de dados é composto de variáveis quantitativas e qualitativas. A tabela a seguir mostra o resumo dos dados
+
+```{r, echo=FALSE}
+
+dados <- read.csv("Dados/Pokemon_full.csv")
+
+summary(dados)
+```
+
+
+### Gráfico de caixas
+```{r}
+
+
+
+df <- dados %>%
+  mutate(
+    classe_altura = case_when(
+      height<5~"Baixinho",
+      height<50~"Pequeno",
+      height<100~"Medio",
+      TRUE~"Altao"
+    )
+  ) %>% 
+  mutate(
+    classe_altura = factor(classe_altura, levels = c("Baixinho", "Pequeno", "Medio", "Altao"))
+  )
+
+  ggplot(df, aes(x = classe_altura, y = weight, fill = classe_altura))+
+    geom_violin()+
+    geom_boxplot(width = 0.2, fill = "white")+
+    labs(x = "Classe altura", y = "Peso")+
+    scale_y_continuous(trans = "log10")+
+    scale_fill_manual(values = cores[c(1,2,3,7)])+
+    theme_bw()+
+    theme(
+      axis.text = element_text(size = 14),
+      axis.title = element_text(size = 16, face = "bold"),
+      legend.position = "none"
+    )
+
+
+```
+
+
+### Gráfico de pontos
+
+```{r, fig.width=5, fig.height=5, fig.align='center'}
+
+  df %>% 
+  arrange(desc(classe_altura)) %>% 
+  ggplot(aes(x = weight, y = height, color = classe_altura))+
+    geom_point(alpha = 0.4, size = 2)+
+    labs(x = "Peso", y = "Altura", color = "Classe altura")+
+    #scale_y_continuous(trans = "log10")+
+    #scale_x_continuous(trans = "log10")+
+    scale_color_manual(values = cores[c(1,2,3,7)])+
+  guides(color = guide_legend(override.aes = list(size = 4)))+
+    theme_bw()+
+    theme(
+      axis.text = element_text(size = 14),
+      axis.title = element_text(size = 16, face = "bold"),
+      legend.position = "right",
+      legend.text = element_text(size = 14),
+      legend.title = element_text(size = 16, face = "bold")
+    )
+
+
+```
+
+### Gráficos facetados
+
+```{r}
+
+df %>% 
+  group_by(classe_altura) %>% 
+  summarise(
+    media_h = mean(height),
+    media_w = mean(weight)
+  ) %>% 
+  pivot_longer(cols = c(2, 3), values_to = "Valor", names_to = "Tipo") %>% 
+  ggplot(aes(x = Tipo, y = Valor, fill = classe_altura))+
+  geom_col()+
+  facet_wrap(.~classe_altura)+
+   theme_bw()+
+    theme(
+      axis.text = element_text(size = 14),
+      axis.title = element_text(size = 16, face = "bold"),
+      legend.position = "none"
+    )
+
+```
+
+### Grafico com dois eixos
+
+```{r}
+
+df_media <- df %>% 
+  group_by(classe_altura) %>% 
+  summarise(
+    media_h = mean(height),
+    media_w = mean(weight)
+  ) %>% 
+  pivot_longer(cols = c(2, 3), values_to = "Valor", names_to = "Tipo") %>%
+  mutate(
+    Medida = case_when(
+      grepl("_h", Tipo) ~"Altura",
+      TRUE ~ "Peso"
+    )
+  )
+  
+
+max_alt <- df_media %>%
+  filter(Medida == "Altura") %>%
+  arrange(desc(Valor)) %>%
+  distinct(Medida, .keep_all = TRUE) %>%pull(Valor)
+
+max_peso <- df_media %>%
+  filter(Medida == "Peso") %>%
+  arrange(desc(Valor)) %>%
+  distinct(Medida, .keep_all = TRUE) %>%pull(Valor)
+
+fator <- max_peso/max_alt
+  
+df_media %>% 
+  mutate(
+    Valor2 = ifelse(Medida == "Altura", Valor*fator, Valor)
+  ) %>% 
+  ggplot(aes(x = classe_altura, y = Valor2, fill = Medida))+
+  geom_col(position = position_dodge2())+
+    labs(x = "Classe", y = "Media do Peso", fill = "Media")+
+  #facet_wrap(.~classe_altura)+
+  scale_y_continuous(
+     # Add a second axis and specify its features
+     sec.axis = sec_axis(~./fator, name="Media da Altura")
+  )+
+    scale_fill_manual(values = cores[c(1,2,3,7)])+
+   theme_bw()+
+    theme(
+      axis.text = element_text(size = 14),
+      axis.title = element_text(size = 16, face = "bold"),
+      legend.position = "right"
+    )
+
+```

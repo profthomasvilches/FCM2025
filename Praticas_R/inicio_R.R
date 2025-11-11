@@ -207,5 +207,3 @@ left_join(dados, df_resumo_mis, by = c("type")) %>% View
 full_join(dados, df_resumo_mis, by = c("type")) %>% View
 inner_join(dados, df_resumo_mis, by = c("type")) %>% View
 
-
-
