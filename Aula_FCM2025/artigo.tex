@@ -1,0 +1,126 @@
+\documentclass{abntex2}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{float}
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{lipsum}
+\usepackage{amsmath}
+
+
+% Bibliografia
+
+% Para bibliografia
+%\RequirePackage{natbib}
+%
+
+
+\newcommand{\biblio}{%
+%\vspace*{2.7cm}
+\thispagestyle{empty}
+\renewcommand\refname{Refer\^encias Bibliogr\'aficas}
+\addcontentsline{toc}{section}{\MakeUppercase{Refer\^encias Bibliogr\'aficas}}
+\bibliographystyle{vancouver}
+\bibliography{\databib}
+}
+\newcommand{\databib}{bibliografia}
+\renewcommand{\baselinestretch}{1.5}
+\setlength{\textwidth}{16cm}
+
+
+\title{Aula Ferramentas}
+\author{Thomas N Vilches}
+\date{Novembro 2025}
+
+\pagenumbering{arabic}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Introdução}
+
+
+\lipsum[1]
+
+
+\subsection{Dengue}
+
+\lipsum[1-6]
+
+A Equação \ref{eq:segundograu}
+
+\begin{equation}
+    f(x) = \frac{x^2+2x+1}{2} \label{eq:segundograu}
+\end{equation}
+
+
+\begin{equation*}
+    f(x) = \frac{x^2+2x+1}{2}
+\end{equation*}
+
+
+\subsubsection{Dengue subsection}
+
+\subsection{Transmissão}
+
+Note as melhores práticas de Word escritas na Figura \ref{fig:bestpratices} extraido de \cite{moghadas2021evaluation}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.15\linewidth]{89256656_2845969895488190_1798273966129807360_n.png}
+    \caption{Melhores práticas Word. Retirado de \cite{moghadas2021evaluation}}
+    \label{fig:bestpratices}
+\end{figure}
+
+\newpage
+
+\lipsum[2]
+
+
+\begin{table}
+    \centering
+    \begin{tabular}{l|cc}
+        1 & 2 & 3\\
+        \hline
+        4 & 5 & 6\\
+        7 & 8 & 9\\
+    \end{tabular}
+    \caption{Caption}
+    \label{tab:placeholder}
+\end{table}
+
+
+\begin{table}[h]
+    \centering
+    \caption{Parâmetros do Modelo \cite{vilches2021}}
+    \label{tab:parametros}
+    \begin{tabular}{c l c l}
+        \toprule
+        \textbf{Parâmetro} & \textbf{Significado} & \textbf{Valor} & \textbf{Referência} \\
+        \midrule
+        $\mu_m$ & Taxa de mortalidade do mosquito & $1/3$ \text{weeks}$^{-1}$ & \text{[ref]} \\
+        $\gamma$ & Inverso do período infeccioso em humanos & $1.0$ \text{weeks}$^{-1}$ & \text{[ref]} \\
+        $\eta$ & Inverso do período latente em humanos & $1.4$ \text{weeks}$^{-1}$ & \text{[ref]} \\
+        $\nu_m$ & Inverso do período latente em mosquitos & $1.0$ \text{weeks}$^{-1}$ & \text{[ref]} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+Referenciando \cite{vilches_disease_2019,ministerio_da_saude_estrategia_2024}
+
+% \begin{thebibliography}{99}
+
+% \bibitem{AutorAno}
+% S. Autor, \textit{Título do Artigo ou Livro}. Nome da Editora ou Revista, ano.
+
+% \bibitem{OutroAutorAno}
+% F. Outro Autor, “Título do Trabalho”, \textit{Nome da Conferência ou Periódico}, vol. 10, pp. 20--35, 2020.
+
+% \end{thebibliography}
+
+\biblio
+
+
+\end{document}
